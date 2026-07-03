@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON) # fail loudly if compiler doesnt support my standard
 
 add_library(stl_impl INTERFACE) # INTERFACE means header only library, no compiled artefacts
+target_include_directories(stl_impl INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # toggle from command line with cmake -B build -DSTL_IMPL_BUILD_BENCHMARKS=ON
 option(STL_IMPL_BUILD_TESTS "Build tests" ON) 
