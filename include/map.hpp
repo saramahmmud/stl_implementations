@@ -44,27 +44,19 @@ public:
     }
 
     bool insert(const Key& key, const Value& value) {
-        Node* curr = root_;
-        Node* prev = nullptr;
-        while (curr){
-            if (comp_(key, curr->data.first)) {
-                prev = curr;
-                curr = curr->left;
-            } else if (comp_(curr->data.first, key)) {
-                prev = curr;
-                curr = curr->right;
+        Node** curr = &root_;
+        Node* parent = nullptr;
+        while (*curr){
+            parent = *curr;
+            if (comp_(key, (*curr)->data.first)) {
+                curr = &(*curr)->left;
+            } else if (comp_((*curr)->data.first, key)) {
+                curr = &(*curr)->right;
             } else {
                 return false;
             }
         }
-        Node* new_node = new Node(key, value, prev);
-        if (!prev) {
-            root_ = new_node;
-        } else if (comp_(key, prev->data.first)) {
-            prev->left = new_node;
-        } else if (comp_(prev->data.first, key)) {
-            prev->right = new_node;
-        }
+        *curr = new Node(key, value, parent);
         size_ ++;
         return true;
     }
@@ -90,29 +82,21 @@ public:
     }
 
     Value& operator[](const Key& key) {
-        Node* curr = root_;
-        Node* prev = nullptr;
-        while (curr){
-            if (comp_(key, curr->data.first)) {
-                prev = curr;
-                curr = curr->left;
-            } else if (comp_(curr->data.first, key)) {
-                prev = curr;
-                curr = curr->right;
+        Node** curr = &root_;
+        Node* parent = nullptr;
+        while (*curr){
+            parent = *curr;
+            if (comp_(key, (*curr)->data.first)) {
+                curr = &(*curr)->left;
+            } else if (comp_((*curr)->data.first, key)) {
+                curr = &(*curr)->right;
             } else {
-                return curr->data.second;
+                return (*curr)->data.second;
             }
         }
-        Node* new_node = new Node(key, Value(), prev);
-        if (!prev) {
-            root_ = new_node;
-        } else if (comp_(key, prev->data.first)) {
-            prev->left = new_node;
-        } else if (comp_(prev->data.first, key)) {
-            prev->right = new_node;
-        }
+        *curr = new Node(key, Value(), parent);
         size_ ++;
-        return new_node->data.second;
+        return (*curr)->data.second;
     }
 
 private:
