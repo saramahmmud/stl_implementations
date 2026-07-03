@@ -70,38 +70,74 @@ public:
     }
 
     Value* find(const Key& key) {
-        // TODO: walk down the tree with comp_; return &node->data.second
-        // if found, nullptr otherwise. Hint: use a private find_node() helper
-        // so this and the const overload below can share logic.
+        Node* node = find_node(key);
+
+        if (node) {
+            return &(node->data.second);
+        }
+
         return nullptr;
     }
 
     const Value* find(const Key& key) const {
-        // TODO: same as above, const version
+        Node* node = find_node(key);
+
+        if (node) {
+            return &(node->data.second);
+        }
+
         return nullptr;
     }
 
     Value& operator[](const Key& key) {
-        // TODO:
-        // - Walk down the tree like insert().
-        // - If key exists, return reference to its value.
-        // - If not, insert a new Node with Value{} (default-constructed),
-        //   increment size_, and return reference to the new value.
-        static Value dummy{}; // placeholder so this compiles; remove once implemented
-        return dummy;
+        Node* curr = root_;
+        Node* prev = nullptr;
+        while (curr){
+            if (comp_(key, curr->data.first)) {
+                prev = curr;
+                curr = curr->left;
+            } else if (comp_(curr->data.first, key)) {
+                prev = curr;
+                curr = curr->right;
+            } else {
+                return curr->data.second;
+            }
+        }
+        Node* new_node = new Node(key, Value(), prev);
+        if (!prev) {
+            root_ = new_node;
+        } else if (comp_(key, prev->data.first)) {
+            prev->left = new_node;
+        } else if (comp_(prev->data.first, key)) {
+            prev->right = new_node;
+        }
+        size_ ++;
+        return new_node->data.second;
     }
 
 private:
     Node* find_node(const Key& key) const {
-        // TODO: walk down the tree with comp_, return the Node* if found,
-        // nullptr if not. Used by both find() overloads.
+        Node* curr = root_;
+        while (curr) {
+            if (comp_(key, curr->data.first)) {
+                curr = curr->left;
+            } else if (comp_(curr->data.first, key)) {
+                curr = curr->right;
+            } else {
+                return curr;
+            }
+        }
         return nullptr;
     }
 
     void destroy(Node* node) {
-        // TODO: post-order recursive delete.
-        // Base case: if node is nullptr, return.
-        // Then destroy(node->left), destroy(node->right), delete node.
+        if (node == nullptr) {
+            return;
+        }
+        destroy(node->left);
+        destroy(node->right);
+        delete node;
+        return;
     }
 };
 }
